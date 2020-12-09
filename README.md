@@ -6,6 +6,13 @@
 
 It is also the official code release of [`[PointRCNN]`](https://arxiv.org/abs/1812.04244), [`[Part-A^2 net]`](https://arxiv.org/abs/1907.03670) and [`[PV-RCNN]`](https://arxiv.org/abs/1912.13192). 
 
+For finetuning with models pretrained with DepthContrast, we added tools/checkpoint.py and slightly modified tools/train.py for loading pretrained models. Here is an example command:
+
+```
+python -m torch.distributed.launch --nproc_per_node=8 train.py --launcher pytorch --cfg_file $cfg_file --pretrained_model $PRE_PATH
+```
+
+We also added two config files under tools/cfgs/kitti_models/, which are pointrcnn_iou_finetune.yaml and PartA2_free_finetune.yaml. You can try these configs for finetuning.
 
 ## Overview
 - [Changelog](#changelog)
