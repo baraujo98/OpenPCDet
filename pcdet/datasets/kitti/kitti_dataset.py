@@ -10,7 +10,7 @@ from ..dataset import DatasetTemplate
 
 
 class KittiDataset(DatasetTemplate):
-    def __init__(self, dataset_cfg, class_names, training=True, root_path=None, logger=None):
+    def __init__(self, dataset_cfg, class_names, training=True, root_path=None, logger=None, train_info="None"):
         """
         Args:
             root_path:
@@ -28,6 +28,8 @@ class KittiDataset(DatasetTemplate):
         split_dir = self.root_path / 'ImageSets' / (self.split + '.txt')
         self.sample_id_list = [x.strip() for x in open(split_dir).readlines()] if split_dir.exists() else None
 
+        self.train_info = train_info
+        
         self.kitti_infos = []
         self.include_kitti_data(self.mode)
 
@@ -37,9 +39,14 @@ class KittiDataset(DatasetTemplate):
         kitti_infos = []
 
         for info_path in self.dataset_cfg.INFO_PATH[mode]:
-            info_path = self.root_path / info_path
-            if not info_path.exists():
-                continue
+            ### For limited label training
+            if self.train_info == "None":
+                info_path = self.root_path / info_path
+                if not info_path.exists():
+                    continue
+            else:
+                info_path = self.train_info
+
             with open(info_path, 'rb') as f:
                 infos = pickle.load(f)
                 kitti_infos.extend(infos)
