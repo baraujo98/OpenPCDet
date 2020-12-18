@@ -13,6 +13,7 @@ python -m torch.distributed.launch --nproc_per_node=8 train.py --launcher pytorc
 ```
 
 We also added two config files under tools/cfgs/kitti_models/, which are pointrcnn_iou_finetune.yaml and PartA2_free_finetune.yaml. You can try these configs for finetuning.
+For different percentages of training data, you can specify a "--train_info /path/to/kitti_info_file.pkl" flag. The info files we used have been updated in data/kitti/split_infos.
 
 ## Overview
 - [Changelog](#changelog)
