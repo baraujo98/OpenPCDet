@@ -13,3 +13,5 @@ venv/
 *.pkl
 *.zip
 *.bin
+
+*third_party/OpenPCDet/data/kitti
