@@ -2,7 +2,7 @@
 **build**
 **egg-info**
 **dist**
-data/
+
 *.pyc
 venv/
 *.idea/
@@ -13,5 +13,3 @@ venv/
 *.pkl
 *.zip
 *.bin
-
-*third_party/OpenPCDet/data/kitti
