@@ -41,7 +41,6 @@ def init_model_from_weights(
     skip_layers=None,
     print_init_layers=True,
     replace_suffix=None,
-    freeze_bb=False,
     append_suffix="trunk.base_model.",
 ):
     """

@@ -4,6 +4,7 @@ import glob
 import os
 from pathlib import Path
 from test import repeat_eval_ckpt
+import numpy as np
 
 import torch
 import torch.distributed as dist
@@ -45,6 +46,7 @@ def parse_config():
     parser.add_argument('--max_waiting_mins', type=int, default=0, help='max waiting minutes')
     parser.add_argument('--start_epoch', type=int, default=0, help='')
     parser.add_argument('--save_to_file', action='store_true', default=False, help='')
+    parser.add_argument('--freeze_bb', action='store_true', default=False, help='freeze the 3D backbone')
 
     args = parser.parse_args()
 
@@ -57,6 +59,13 @@ def parse_config():
 
     return args, cfg
 
+def parameter_description(model):
+    desc = ''
+    for n, p in model.named_parameters():
+        desc += "{:70} | {:10} | {:30} | {}\n".format(
+            n, 'Trainable' if p.requires_grad else 'Frozen',
+            ' x '.join([str(s) for s in p.size()]), str(np.prod(p.size())))
+    return desc
 
 def main():
     args, cfg = parse_config()
@@ -129,7 +138,7 @@ def main():
     if args.pretrained_model is not None:
         ### Change for finetuning
         state = torch.load(args.pretrained_model)
-        init_model_from_weights(model, state['model'], freeze_bb=False)
+        init_model_from_weights(model, state['model'])
         #model.load_params_from_file(filename=args.pretrained_model, to_cpu=dist, logger=logger)
 
     if args.ckpt is not None:
@@ -144,10 +153,19 @@ def main():
             )
             last_epoch = start_epoch + 1
 
+    if args.freeze_bb == True:
+        logger.info('******* Freezing the backbone ********')
+        model.backbone_3d.requires_grad_(requires_grad=False)
+    elif args.freeze_bb == False:
+        logger.info('******* Backbone is trainable ********')
+        model.backbone_3d.requires_grad_(requires_grad=True)
+
     model.train()  # before wrap to DistributedDataParallel to support fixed some parameters
     if dist_train:
         model = nn.parallel.DistributedDataParallel(model, device_ids=[cfg.LOCAL_RANK % torch.cuda.device_count()])
+    
     logger.info(model)
+    logger.info(parameter_description(model))
 
     lr_scheduler, lr_warmup_scheduler = build_scheduler(
         optimizer, total_iters_each_epoch=len(train_loader), total_epochs=args.epochs,
