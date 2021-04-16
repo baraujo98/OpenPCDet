@@ -3,6 +3,9 @@
 **egg-info**
 **dist**
 **data**
+output**
+checkpoints**
+
 *.pyc
 venv/
 *.idea/
@@ -13,3 +16,4 @@ venv/
 *.pkl
 *.zip
 *.bin
+data/kitti

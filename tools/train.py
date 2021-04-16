@@ -26,12 +26,12 @@ def parse_config():
 
     parser.add_argument('--batch_size', type=int, default=None, required=False, help='batch size for training')
     parser.add_argument('--epochs', type=int, default=None, required=False, help='number of epochs to train for')
-    parser.add_argument('--workers', type=int, default=8, help='number of workers for dataloader')
+    parser.add_argument('--workers', type=int, default=3, help='number of workers for dataloader')
     parser.add_argument('--extra_tag', type=str, default='default', help='extra tag for this experiment')
     parser.add_argument('--ckpt', type=str, default=None, help='checkpoint to start from')
     parser.add_argument('--pretrained_model', type=str, default=None, help='pretrained_model')
     parser.add_argument('--train_info', type=str, default="None", help='train info file')    
-    parser.add_argument('--launcher', choices=['none', 'pytorch', 'slurm'], default='none')
+    parser.add_argument('--launcher', choices=['none', 'pytorch', 'slurm'], default='pytorch')
     parser.add_argument('--tcp_port', type=int, default=18888, help='tcp port for distrbuted training')
     parser.add_argument('--sync_bn', action='store_true', default=False, help='whether to use sync bn')
     parser.add_argument('--fix_random_seed', action='store_true', default=False, help='')
@@ -129,7 +129,7 @@ def main():
     if args.pretrained_model is not None:
         ### Change for finetuning
         state = torch.load(args.pretrained_model)
-        init_model_from_weights(model, state, freeze_bb=False)
+        init_model_from_weights(model, state['model'], freeze_bb=False)
         #model.load_params_from_file(filename=args.pretrained_model, to_cpu=dist, logger=logger)
 
     if args.ckpt is not None:

@@ -37,7 +37,7 @@ def append_module_suffix(state_dict, suffix):
 def init_model_from_weights(
     model,
     state_dict,
-    state_dict_key_name="classy_state_dict",
+    state_dict_key_name="model",
     skip_layers=None,
     print_init_layers=True,
     replace_suffix=None,
@@ -54,20 +54,20 @@ def init_model_from_weights(
                     indicates whether the layername was copied or not
     """
     # whether it's a model from somewhere else or a model from this codebase
-    if state_dict_key_name and len(state_dict_key_name) > 0:
-        #state_dict = state_dict["model_state_dict"]
-        assert (
-            state_dict_key_name in state_dict.keys()
-        ), f"Unknown state dict key: {state_dict_key_name}"
-        state_dict = state_dict[state_dict_key_name]
-    if state_dict_key_name == "classy_state_dict":
-        classy_state_dict = state_dict["base_model"]["model"]
-        state_dict = {}
-        state_dict.update(classy_state_dict["trunk"])
-    if replace_suffix:
-        state_dict = replace_module_suffix(state_dict, replace_suffix)
-    if append_suffix:
-        state_dict = append_module_suffix(state_dict, append_suffix)
+    # if state_dict_key_name and len(state_dict_key_name) > 0:
+    #     #state_dict = state_dict["model_state_dict"]
+    #     assert (
+    #         state_dict_key_name in state_dict.keys()
+    #     ), f"Unknown state dict key: {state_dict_key_name}"
+    #     state_dict = state_dict[state_dict_key_name]
+    # if state_dict_key_name == "classy_state_dict":
+    #     classy_state_dict = state_dict["base_model"]["model"]
+    #     state_dict = {}
+    #     state_dict.update(classy_state_dict["trunk"])
+    # if replace_suffix:
+    #     state_dict = replace_module_suffix(state_dict, replace_suffix)
+    # if append_suffix:
+    #     state_dict = append_module_suffix(state_dict, append_suffix)
 
     all_layers = model.state_dict()
     init_layers = {layername: False for layername in all_layers}
@@ -78,10 +78,10 @@ def init_model_from_weights(
         if 'backbone_3d' not in param_name:
             continue
         tempname = param_name[11:]
-        if "trunk.base_model.0"+tempname in state_dict:
-            new_state_dict[param_name] = state_dict["trunk.base_model.0"+tempname]
-        elif "trunk.base_model.2"+tempname in state_dict:
-            new_state_dict[param_name] = state_dict["trunk.base_model.2"+tempname]
+        if "module.trunk.0"+tempname in state_dict:
+            new_state_dict[param_name] = state_dict["module.trunk.0"+tempname]
+        elif "module.trunk.2"+tempname in state_dict:
+            new_state_dict[param_name] = state_dict["module.trunk.2"+tempname]
         else:
             print (param_name)
     state_dict = new_state_dict
