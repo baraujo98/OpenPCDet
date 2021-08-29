@@ -38,7 +38,7 @@ def parse_config():
     parser.add_argument('--fix_random_seed', action='store_true', default=False, help='')
     parser.add_argument('--ckpt_save_interval', type=int, default=1, help='number of training epochs')
     parser.add_argument('--local_rank', type=int, default=0, help='local rank for distributed training')
-    parser.add_argument('--max_ckpt_save_num', type=int, default=60, help='max number of saved checkpoint')
+    parser.add_argument('--max_ckpt_save_num', type=int, default=100, help='max number of saved checkpoint')
     parser.add_argument('--merge_all_iters_to_one_epoch', action='store_true', default=False, help='')
     parser.add_argument('--set', dest='set_cfgs', default=None, nargs=argparse.REMAINDER,
                         help='set extra config keys if needed')
@@ -209,9 +209,9 @@ def main():
             batch_size=args.batch_size,
             dist=dist_train, workers=args.workers, logger=logger, training=False
         )
-        eval_output_dir = output_dir / 'eval' / 'eval_with_train'
+        eval_output_dir = output_dir / 'eval' / 'eval_all_default' / 'default'
         eval_output_dir.mkdir(parents=True, exist_ok=True)
-        args.start_epoch = max(args.epochs - 10, 0)  # Only evaluate the last 10 epochs
+        args.start_epoch = 70  # Only evaluate the last 10 epochs
 
         repeat_eval_ckpt(
             model.module if dist_train else model,

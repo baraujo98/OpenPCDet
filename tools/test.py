@@ -31,7 +31,7 @@ def parse_config():
     parser.add_argument('--set', dest='set_cfgs', default=None, nargs=argparse.REMAINDER,
                         help='set extra config keys if needed')
 
-    parser.add_argument('--max_waiting_mins', type=int, default=30, help='max waiting minutes')
+    parser.add_argument('--max_waiting_mins', type=int, default=2, help='max waiting minutes')
     parser.add_argument('--start_epoch', type=int, default=0, help='')
     parser.add_argument('--eval_tag', type=str, default='default', help='eval tag for this experiment')
     parser.add_argument('--eval_all', action='store_true', default=False, help='whether to evaluate all checkpoints')
@@ -69,6 +69,8 @@ def get_no_evaluated_ckpt(ckpt_dir, ckpt_record_file, args):
     ckpt_list.sort(key=os.path.getmtime)
     evaluated_ckpt_list = [float(x.strip()) for x in open(ckpt_record_file, 'r').readlines()]
 
+    evaluate_epochs=[1,5,10,15,20,25,30,35,40,45,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80]
+
     for cur_ckpt in ckpt_list:
         num_list = re.findall('checkpoint_epoch_(.*).pth', cur_ckpt)
         if num_list.__len__() == 0:
@@ -77,7 +79,7 @@ def get_no_evaluated_ckpt(ckpt_dir, ckpt_record_file, args):
         epoch_id = num_list[-1]
         if 'optim' in epoch_id:
             continue
-        if float(epoch_id) not in evaluated_ckpt_list and int(float(epoch_id)) >= args.start_epoch:
+        if float(epoch_id) not in evaluated_ckpt_list and int(float(epoch_id)) >= args.start_epoch and int(float(epoch_id)) in evaluate_epochs:
             return epoch_id, cur_ckpt
     return -1, None
 
